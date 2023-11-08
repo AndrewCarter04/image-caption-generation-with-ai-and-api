@@ -32,6 +32,12 @@ def convert_image_to_base64(image):
 
     return img_data
 
+def convert_base64_to_image(base64):
+    binary_data = base64.b64decode(base64)
+    buffered = BytesIO(binary_data)
+    pil_image = Image.open(buffered)
+    return pil_image
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -59,6 +65,22 @@ def generate_caption_api():
         image = request.files['image']
         caption = generate_caption(image)
         image_name = image.filename
+
+        response = {
+            'image_name': image_name,
+            'description': caption
+        }
+
+        return jsonify(response)
+    else:
+        return jsonify({'error': 'No image uploaded'})
+
+@app.route('/api/generate_caption_base64', methods=['GET'])
+def generate_caption_api_base64():
+    if 'image' in request.args:
+        image = request.args.get('image')
+        caption = generate_caption(convert_base64_to_image(image))
+        image_name = 'image'
 
         response = {
             'image_name': image_name,
