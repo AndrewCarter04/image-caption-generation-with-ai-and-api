@@ -32,11 +32,9 @@ def convert_image_to_base64(image):
 
     return img_data
 
-def convert_base64_to_image(base64):
-    binary_data = base64.b64decode(base64)
-    buffered = BytesIO(binary_data)
-    pil_image = Image.open(buffered)
-    return pil_image
+def convert_base64_to_image(base64_img):
+    base64_img += '=' * (-len(base64_img) % 4)
+    return BytesIO(b64decode(bytes(base64_img, "utf-8")))
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -80,16 +78,15 @@ def generate_caption_api_base64():
     if 'image' in request.args:
         image = request.args.get('image')
         caption = generate_caption(convert_base64_to_image(image))
-        image_name = 'image'
 
         response = {
-            'image_name': image_name,
             'description': caption
         }
 
         return jsonify(response)
     else:
         return jsonify({'error': 'No image uploaded'})
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
