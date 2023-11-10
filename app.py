@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from PIL import Image
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from io import BytesIO
 import time
 
